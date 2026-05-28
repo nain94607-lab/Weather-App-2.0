@@ -1,82 +1,111 @@
-import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { Link, Stack } from 'expo-router';
-import { MoonStarIcon, StarIcon, SunIcon } from 'lucide-react-native';
-import * as React from 'react';
-import { Image, type ImageStyle, View } from 'react-native';
-import { Uniwind, useUniwind } from 'uniwind';
+import { useState } from 'react';
+import { Text, TouchableOpacity, View, Dimensions } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
-const LOGO = {
-  light: require('@/assets/images/react-native-reusables-light.png'),
-  dark: require('@/assets/images/react-native-reusables-dark.png'),
+import { weatherData } from '@/data/weather';
+
+// Icono del clima
+const WeatherIcon = ({ condition }: { condition: string }) => {
+  const iconSize = Dimensions.get('window').height * 0.16;
+
+  switch (condition) {
+    case '☀️':
+      return <Ionicons name="sunny-outline" size={iconSize} color="black" />;
+    case '🌧️':
+      return <MaterialCommunityIcons name="weather-pouring" size={iconSize} color="black" />;
+    case '⛅':
+      return <MaterialCommunityIcons name="weather-cloudy" size={iconSize} color="black" />;
+    default:
+      return <Ionicons name="sunny-outline" size={iconSize} color="black" />;
+  }
 };
 
-const SCREEN_OPTIONS = {
-  title: 'React Native Reusables',
-  headerTransparent: true,
-  headerRight: () => <ThemeToggle />,
-};
+export default function HomeScreen() {
+  const [diaActual, setDiaActual] = useState(0);
 
-const IMAGE_STYLE: ImageStyle = {
-  height: 76,
-  width: 76,
-};
+  const clima = weatherData[diaActual];
 
-export default function Screen() {
-  const { theme } = useUniwind();
+  const siguienteDia = () => {
+    if (diaActual < weatherData.length - 1) {
+      setDiaActual(diaActual + 1);
+    }
+  };
+
+  const diaAnterior = () => {
+    if (diaActual > 0) {
+      setDiaActual(diaActual - 1);
+    }
+  };
 
   return (
-    <>
-      <Stack.Screen options={SCREEN_OPTIONS} />
-      <View className="flex-1 items-center justify-center gap-8 p-4">
-        <Image source={LOGO[theme ?? 'light']} style={IMAGE_STYLE} resizeMode="contain" />
-        <View className="gap-2 p-4">
-          <Text className="ios:text-foreground text-muted-foreground font-mono text-sm">
-            1. Edit <Text variant="code">app/index.tsx</Text> to get started.
-          </Text>
-          <Text className="ios:text-foreground text-muted-foreground font-mono text-sm">
-            2. Save to see your changes instantly.
-          </Text>
+    <View testID="weather-screen" className="flex-1 bg-[#dbeafe] items-center justify-between pt-16 pb-10">
+
+      <StatusBar style="auto" />
+
+      {/* CIUDAD */}
+      <View className="items-center">
+        <Text testID="city-name" className="text-3xl font-bold tracking-widest">
+          {clima.city.toUpperCase()}
+        </Text>
+
+        <Text className="text-gray-500 mt-1">
+          {clima.day}
+        </Text>
+      </View>
+
+      {/* CLIMA PRINCIPAL */}
+      <View className="items-center">
+        <WeatherIcon condition={clima.condition} />
+
+        <Text className="text-7xl font-light">
+          {clima.temperature}°
+        </Text>
+
+        <Text className="text-gray-600">
+          Min: {clima.min}° / Max: {clima.max}°
+        </Text>
+      </View>
+
+      {/* MÉTRICAS */}
+      <View className="flex-row justify-around w-full px-6">
+        <View testID="humidity">
+          <Text>💧 {clima.humidity}%</Text>
         </View>
-        <View className="flex-row gap-2">
-          <Link href="https://reactnativereusables.com" asChild>
-            <Button>
-              <Text>Browse the Docs</Text>
-            </Button>
-          </Link>
-          <Link href="https://github.com/founded-labs/react-native-reusables" asChild>
-            <Button variant="ghost">
-              <Text>Star the Repo</Text>
-              <Icon as={StarIcon} />
-            </Button>
-          </Link>
+
+        <View testID="wind">
+          <Text>🌬️ {clima.wind} m/s</Text>
+        </View>
+
+        <View testID="pressure">
+          <Text>🌡️ {clima.pressure} hPa</Text>
         </View>
       </View>
-    </>
-  );
-}
 
-const THEME_ICONS = {
-  light: SunIcon,
-  dark: MoonStarIcon,
-};
+      {/* BOTONES */}
+      <View className="flex-row gap-6">
 
-function ThemeToggle() {
-  const { theme } = useUniwind();
+        <TouchableOpacity
+          testID="previous-button"
+          onPress={diaAnterior}
+          disabled={diaActual === 0}
+          className="bg-sky-200 px-6 py-3 rounded-full"
+        >
+          <AntDesign name="left" size={16} />
+          <Text>Anterior</Text>
+        </TouchableOpacity>
 
-  function toggleTheme() {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    Uniwind.setTheme(newTheme);
-  }
+        <TouchableOpacity
+          testID="next-button"
+          onPress={siguienteDia}
+          disabled={diaActual === weatherData.length - 1}
+          className="bg-sky-200 px-6 py-3 rounded-full"
+        >
+          <Text>Siguiente</Text>
+          <AntDesign name="right" size={16} />
+        </TouchableOpacity>
 
-  return (
-    <Button
-      onPressIn={toggleTheme}
-      size="icon"
-      variant="ghost"
-      className="ios:size-9 web:mx-4 rounded-full">
-      <Icon as={THEME_ICONS[theme ?? 'light']} className="size-5" />
-    </Button>
+      </View>
+    </View>
   );
 }
