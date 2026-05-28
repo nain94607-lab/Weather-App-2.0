@@ -1,110 +1,28 @@
-import { useState } from 'react';
-import { Text, TouchableOpacity, View, Dimensions } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Text, View } from 'react-native';
 
-import { weatherData } from '@/data/weather';
-
-// Icono del clima
-const WeatherIcon = ({ condition }: { condition: string }) => {
-  const iconSize = Dimensions.get('window').height * 0.16;
-
-  switch (condition) {
-    case '☀️':
-      return <Ionicons name="sunny-outline" size={iconSize} color="black" />;
-    case '🌧️':
-      return <MaterialCommunityIcons name="weather-pouring" size={iconSize} color="black" />;
-    case '⛅':
-      return <MaterialCommunityIcons name="weather-cloudy" size={iconSize} color="black" />;
-    default:
-      return <Ionicons name="sunny-outline" size={iconSize} color="black" />;
-  }
-};
+import { Icon } from '@/components/ui/icon';
+import { SunIcon } from 'lucide-react-native';
 
 export default function HomeScreen() {
-  const [diaActual, setDiaActual] = useState(0);
-
-  const clima = weatherData[diaActual];
-
-  const siguienteDia = () => {
-    if (diaActual < weatherData.length - 1) {
-      setDiaActual(diaActual + 1);
-    }
-  };
-
-  const diaAnterior = () => {
-    if (diaActual > 0) {
-      setDiaActual(diaActual - 1);
-    }
-  };
-
   return (
-    <View testID="weather-screen" className="flex-1 bg-[#dbeafe] items-center justify-between pt-16 pb-10">
-
-      <StatusBar style="auto" />
-
-      {/* CIUDAD */}
-      <View className="items-center">
-        <Text testID="city-name" className="text-3xl font-bold tracking-widest">
-          {clima.city.toUpperCase()}
-        </Text>
-
-        <Text className="text-gray-500 mt-1">
-          {clima.day}
-        </Text>
+    <View className="w-full flex-1 bg-white px-4 py-6" testID="weather-screen">
+      <View className="flex w-full flex-row items-center justify-between">
+        <Text className="text-lg">27/05</Text>
+        <Text className="text-lg font-bold">28/05</Text>
+        <Text className="text-lg">29/05</Text>
       </View>
+      <Text testID="city-name">Villa Lugano</Text>
 
-      {/* CLIMA PRINCIPAL */}
-      <View className="items-center">
-        <WeatherIcon condition={clima.condition} />
-
-        <Text className="text-7xl font-light">
-          {clima.temperature}°
-        </Text>
-
-        <Text className="text-gray-600">
-          Min: {clima.min}° / Max: {clima.max}°
-        </Text>
+      <Icon as={SunIcon}></Icon>
+      <View>
+        <Text testID="humidity"> Humedad: 98%</Text>
+        <Text testID="wind"> Viento: 12 m/s</Text>
+        <Text testID="pressure"> Presión: 1000 hPa</Text>
       </View>
-
-      {/* MÉTRICAS */}
-      <View className="flex-row justify-around w-full px-6">
-        <View testID="humidity">
-          <Text>💧 {clima.humidity}%</Text>
-        </View>
-
-        <View testID="wind">
-          <Text>🌬️ {clima.wind} m/s</Text>
-        </View>
-
-        <View testID="pressure">
-          <Text>🌡️ {clima.pressure} hPa</Text>
-        </View>
-      </View>
-
-      {/* BOTONES */}
-      <View className="flex-row gap-6">
-
-        <TouchableOpacity
-          testID="previous-button"
-          onPress={diaAnterior}
-          disabled={diaActual === 0}
-          className="bg-sky-200 px-6 py-3 rounded-full"
-        >
-          <AntDesign name="left" size={16} />
-          <Text>Anterior</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          testID="next-button"
-          onPress={siguienteDia}
-          disabled={diaActual === weatherData.length - 1}
-          className="bg-sky-200 px-6 py-3 rounded-full"
-        >
-          <Text>Siguiente</Text>
-          <AntDesign name="right" size={16} />
-        </TouchableOpacity>
-
+      <View className="flex w-full flex-row items-center justify-between">
+        <Text className="text-lg">27º</Text>
+        <Text className="text-lg font-bold">15º</Text>
+        <Text className="text-lg">20º</Text>
       </View>
     </View>
   );
